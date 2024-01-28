@@ -13,4 +13,4 @@ ArtApp is a mobile application that provides access to the Cooper Hewitt art col
 - Coroutines
 
 # API
-API: https://www.abibliadigital.com.br/en
+API: https://collection.cooperhewitt.org/api/
