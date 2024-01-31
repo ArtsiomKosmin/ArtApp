@@ -28,7 +28,8 @@
                 android:id="@+id/art_im"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:srcCompat="@drawable/ic_launcher_background" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:srcCompat="@drawable/ic_loading" />
 
             <TextView
                 android:id="@+id/title_tv"

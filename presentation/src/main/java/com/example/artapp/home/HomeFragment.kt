@@ -1,63 +1,74 @@
 package com.example.artapp.home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.artapp.R
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.artapp.databinding.FragmentHomeBinding
-import com.example.domain.entity.ArtEntity
+import com.example.data.source.remote.RetrofitInstance
+import com.example.data.repository.ArtRepositoryImpl
+import com.example.domain.GetArtsUseCase
+import com.example.domain.useCase.base.executeSafely
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class HomeFragment : Fragment() {
-//    private var param1: String? = null
-//    private var param2: String? = null
     private lateinit var binding: FragmentHomeBinding
-
-    //check
-    private val artList = arrayListOf<ArtEntity>(ArtEntity(0, "aaaa"), ArtEntity(1, "bbbbb"), ArtEntity(2, "cccc"))
+    private lateinit var homeAdapter: HomeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHomeBinding.inflate(inflater)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        homeAdapter = HomeAdapter()
         init()
     }
 
     private fun init() {
+        val getArtsUseCase = GetArtsUseCase(
+            artRepository = ArtRepositoryImpl(
+                artApi = RetrofitInstance.artApi
+            )
+        )
+
         binding.apply {
-            rcView.layoutManager = GridLayoutManager(context, 2)
-            rcView.adapter = ArtAdapter(artList)
+            rcView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                getArtsUseCase.executeSafely(Unit).fold(
+                    onSuccess = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            homeAdapter.submitList(it.artObjects)
+                            rcView.adapter = homeAdapter
+                            Log.d("CHECK", "good")
+                        }
+                    },
+                    onFailure = {
+                        Log.d("CHECK", "Bad", it)
+                    }
+                )
+            }
         }
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        fun newInstance() = HomeFragment
     }
 }
