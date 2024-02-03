@@ -47,8 +47,8 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun UIState.States.updateUI() = when (this) {
-        is UIState.States.Data -> {
+    private fun States.updateUI() = when (this) {
+        is States.Data -> {
             binding.loadingBar.visibility = View.INVISIBLE
             binding.tvError.visibility = View.INVISIBLE
             binding.rcView.visibility = View.VISIBLE
@@ -57,12 +57,12 @@ class HomeFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        is UIState.States.Loading -> {
+        is States.Loading -> {
             binding.loadingBar.visibility = View.VISIBLE
             binding.tvError.visibility = View.INVISIBLE
             binding.rcView.visibility = View.INVISIBLE
         }
-        is UIState.States.Error -> {
+        is States.Error -> {
             binding.loadingBar.visibility = View.INVISIBLE
             binding.tvError.visibility = View.VISIBLE
             binding.rcView.visibility = View.INVISIBLE
