@@ -8,33 +8,47 @@ import com.example.artapp.home.HomeFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setBottomNavListner()
 
         if (savedInstanceState == null) {
-            FragmentManager.setFragment(HomeFragment.getInstance(), this)
+            showHomeFragment()
         }
+        setBottomNavListener()
     }
 
-    private fun setBottomNavListner() {
-        binding.bottomNavigation.setOnItemSelectedListener {
-            when(it.itemId) {
-                R.id.home -> {
-                    FragmentManager.setFragment(HomeFragment.getInstance(), this)
-                }
-                R.id.favorite -> {
-                    Log.d("Check", "favorite")
-                }
-                R.id.settings -> {
-                    Log.d("Check", "settings")
-                }
+    private fun setBottomNavListener() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> showHomeFragment()
+                R.id.favorite -> Log.d("Check", "favorite")
+                R.id.settings -> Log.d("Check", "settings")
             }
             true
         }
     }
 
+    private fun showHomeFragment() {
+        FragmentManager.setFragment(HomeFragment.getInstance(), this)
+    }
+
 
 }
+
+
+//val content: View = findViewById(android.R.id.content)
+//content.viewTreeObserver.addOnPreDrawListener(
+//object : ViewTreeObserver.OnPreDrawListener {
+//    override fun onPreDraw(): Boolean {
+//        return if (viewModel.liveState.value is States.Data) {
+//            content.viewTreeObserver.removeOnPreDrawListener(this)
+//            true
+//        } else {
+//            false
+//        }
+//    }
+//}
+//)
