@@ -1,7 +1,7 @@
 package com.example.domain.repository
 
-import com.example.domain.entity.ArtsResponse
+import com.example.domain.models.ArtEntity
 
 interface ArtRepository {
-    suspend fun getArtObjects(): ArtsResponse
+    suspend fun getArtObjects(): List<ArtEntity>
 }

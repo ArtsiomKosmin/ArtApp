@@ -1,6 +1,6 @@
-package com.example.domain.entity
+package com.example.data.models
 
-data class ArtObject(
+data class ArtDto(
     val links: Links,
     val id: String,
     val objectNumber: String,
@@ -36,4 +36,8 @@ data class HeaderImage(
     val width: Int,
     val height: Int,
     val url: String
+)
+
+data class ArtsResponse(
+    val artObjects: List<ArtDto>
 )
