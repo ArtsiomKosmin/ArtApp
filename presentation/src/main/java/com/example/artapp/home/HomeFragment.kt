@@ -1,30 +1,21 @@
 package com.example.artapp.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.artapp.databinding.FragmentHomeBinding
-import com.example.data.source.remote.RetrofitInstance
-import com.example.data.repository.ArtRepositoryImpl
-import com.example.domain.GetArtsUseCase
-import com.example.domain.useCase.base.executeSafely
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var homeAdapter: HomeAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val homeAdapter by lazy { HomeAdapter() }
+    private lateinit var viewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,39 +27,60 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeAdapter = HomeAdapter()
-        init()
+        initUI()
+        initViewModel()
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshData()
+        }
     }
 
-    private fun init() {
-        val getArtsUseCase = GetArtsUseCase(
-            artRepository = ArtRepositoryImpl(
-                artApi = RetrofitInstance.artApi
-            )
-        )
+    private fun initUI() {
+//        binding.rcView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.rcView.layoutManager = GridLayoutManager(requireContext(), 1)
+        binding.rcView.adapter = homeAdapter
+    }
 
-        binding.apply {
-            rcView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        viewModel.liveState.observe(viewLifecycleOwner, Observer{
+            it.updateUI()
+        })
+    }
 
-            CoroutineScope(Dispatchers.IO).launch {
-                getArtsUseCase.executeSafely(Unit).fold(
-                    onSuccess = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            homeAdapter.submitList(it.artObjects)
-                            rcView.adapter = homeAdapter
-                            Log.d("CHECK", "good")
-                        }
-                    },
-                    onFailure = {
-                        Log.d("CHECK", "Bad", it)
-                    }
-                )
-            }
+    private fun UIState.States.updateUI() = when (this) {
+        is UIState.States.Data -> {
+            binding.loadingBar.visibility = View.INVISIBLE
+            binding.tvError.visibility = View.INVISIBLE
+            binding.rcView.visibility = View.VISIBLE
+            homeAdapter.submitList(arts)
+
+            binding.swipeRefreshLayout.isRefreshing = false
         }
+
+        is UIState.States.Loading -> {
+            binding.loadingBar.visibility = View.VISIBLE
+            binding.tvError.visibility = View.INVISIBLE
+            binding.rcView.visibility = View.INVISIBLE
+        }
+        is UIState.States.Error -> {
+            binding.loadingBar.visibility = View.INVISIBLE
+            binding.tvError.visibility = View.VISIBLE
+            binding.rcView.visibility = View.INVISIBLE
+
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() = HomeFragment
+        private var instance: HomeFragment? = null
+
+        fun getInstance(): HomeFragment {
+            if (instance == null) {
+                instance = HomeFragment()
+            }
+            return instance!!
+        }
     }
 }
