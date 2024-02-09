@@ -10,6 +10,7 @@ import com.example.domain.useCase.GetArtsUseCase
 import com.example.domain.models.ArtEntity
 import com.example.domain.useCase.base.executeSafely
 import kotlinx.coroutines.launch
+import java.io.FileOutputStream
 
 sealed class States {
     data object Loading : States()
@@ -30,6 +31,7 @@ class HomeViewModel : ViewModel() {
     }
 
     override fun onCleared() {
+        Log.d("Check", "vm cleared")
         super.onCleared()
     }
 

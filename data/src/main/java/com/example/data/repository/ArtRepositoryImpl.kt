@@ -10,6 +10,11 @@ class ArtRepositoryImpl(
 ): ArtRepository {
     override suspend fun getArtObjects(): List<ArtEntity> {
         val allArts = artApi.getAllArts()
-        return allArts.artObjects.map { it.toDomain() }
+        if (allArts.isSuccessful) {
+            return allArts.body()!!.artObjects.map { it.toDomain() }
+        } else {
+            throw Exception()
+        }
+
     }
 }

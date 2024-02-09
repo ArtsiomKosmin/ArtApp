@@ -37,15 +37,8 @@ class HomeAdapter : ListAdapter<ArtEntity, HomeAdapter.Holder>(Comparator()) {
         fun bind(art: ArtEntity) = with(binding) {
             titleTv.text = art.title
 
-//            artIm.apply {
-//                Glide.with(this)
-//                    .load(art.webImage.url)
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .into(this)
-//            }
-
 //            ImageLoader.load(artIm.context, art.headerImage.url, artIm)
-            ImageLoader.load(artIm.context, art.webImage.url, artIm)
+            ImageLoader.load(artIm.context, art.webImage.url, artIm, itemProgressBar)
         }
     }
 

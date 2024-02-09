@@ -49,8 +49,8 @@ class HomeFragment : Fragment() {
 
     private fun States.updateUI() = when (this) {
         is States.Data -> {
-            binding.loadingBar.visibility = View.INVISIBLE
-            binding.tvError.visibility = View.INVISIBLE
+            binding.loadingBar.visibility = View.GONE
+            binding.tvError.visibility = View.GONE
             binding.rcView.visibility = View.VISIBLE
             homeAdapter.submitList(arts)
 
@@ -59,17 +59,17 @@ class HomeFragment : Fragment() {
 
         is States.Loading -> {
             binding.loadingBar.visibility = View.VISIBLE
-            binding.tvError.visibility = View.INVISIBLE
-            binding.rcView.visibility = View.INVISIBLE
+            binding.tvError.visibility = View.GONE
+            binding.rcView.visibility = View.GONE
         }
+
         is States.Error -> {
-            binding.loadingBar.visibility = View.INVISIBLE
+            binding.loadingBar.visibility = View.GONE
             binding.tvError.visibility = View.VISIBLE
-            binding.rcView.visibility = View.INVISIBLE
+            binding.rcView.visibility = View.GONE
 
             binding.swipeRefreshLayout.isRefreshing = false
         }
-
     }
 
     companion object {

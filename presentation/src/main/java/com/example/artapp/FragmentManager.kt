@@ -9,6 +9,7 @@ object FragmentManager {
     fun setFragment (newFrag: Fragment, activity: AppCompatActivity) {
         /*val transaction = */activity.supportFragmentManager.beginTransaction()
             .replace(R.id.frameLatout, newFrag)
+            .addToBackStack(null)
             .commit()
         currentFrag = newFrag
     }
