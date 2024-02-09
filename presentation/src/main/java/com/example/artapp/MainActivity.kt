@@ -22,16 +22,6 @@ class MainActivity : AppCompatActivity() {
         setBottomNavListener()
     }
 
-//    override fun onBackPressed() {
-//        val currentFragment = supportFragmentManager.findFragmentById(R.id.frameLatout)
-//
-//        if (supportFragmentManager.backStackEntryCount > 0) {
-//            supportFragmentManager.popBackStack("fragmentTag", FragmentManager.currentFrag)
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
-
     private fun setBottomNavListener() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {

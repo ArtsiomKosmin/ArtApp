@@ -1,13 +1,11 @@
 package com.example.artapp.home
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.artapp.ImageLoader
-import com.example.artapp.R
 import com.example.artapp.databinding.ArtItemBinding
 import com.example.domain.models.ArtEntity
 
@@ -30,6 +28,8 @@ class HomeAdapter(
         holder.bind(getItem(position))
     }
 
+    private var onItemClickListener: ((ArtEntity) -> Unit)? = null
+
     override fun onBindViewHolder(
         holder: Holder,
         position: Int,
@@ -42,6 +42,16 @@ class HomeAdapter(
                 holder.bindFavoriteState(getItem(position).isFavorite)
             }
         }
+
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.let {
+                it(getItem(position))
+            }
+        }
+    }
+
+    fun setOnItemClickListener(listener: (ArtEntity) -> Unit) {
+        onItemClickListener = listener
     }
 
     class Holder(

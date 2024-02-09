@@ -1,5 +1,7 @@
 package com.example.domain.models
 
+import java.io.Serializable
+
 data class ArtEntity(
     val id: String,
     val title: String,
@@ -7,7 +9,7 @@ data class ArtEntity(
     val webImage: WebImage,
     val headerImage: HeaderImage,
     val isFavorite: Boolean
-)
+): Serializable
 
 data class HeaderImage(
     val url: String
