@@ -10,5 +10,6 @@ internal fun ArtDto.toDomain() = ArtEntity(
     title = title,
     longTitle = longTitle,
     webImage = WebImage(url = webImage.url),
-    headerImage = HeaderImage(url = headerImage.url)
-)
+    headerImage = HeaderImage(url = headerImage.url),
+    isFavorite = false
+    )

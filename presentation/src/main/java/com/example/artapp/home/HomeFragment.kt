@@ -14,7 +14,7 @@ import com.example.artapp.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private val homeAdapter by lazy { HomeAdapter() }
+    private val homeAdapter by lazy { HomeAdapter(this::toggleFavoriteStatus) }
     private lateinit var viewModel: HomeViewModel
 
     override fun onCreateView(
@@ -45,6 +45,10 @@ class HomeFragment : Fragment() {
         viewModel.liveState.observe(viewLifecycleOwner, Observer{
             it.updateUI()
         })
+    }
+
+    private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
+        viewModel.toggleFavoriteStatus(id, isFavorite)
     }
 
     private fun States.updateUI() = when (this) {

@@ -5,7 +5,8 @@ data class ArtEntity(
     val title: String,
     val longTitle: String,
     val webImage: WebImage,
-    val headerImage: HeaderImage
+    val headerImage: HeaderImage,
+    val isFavorite: Boolean
 )
 
 data class HeaderImage(

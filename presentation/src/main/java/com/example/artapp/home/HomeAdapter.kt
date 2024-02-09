@@ -11,38 +11,76 @@ import com.example.artapp.R
 import com.example.artapp.databinding.ArtItemBinding
 import com.example.domain.models.ArtEntity
 
-class HomeAdapter : ListAdapter<ArtEntity, HomeAdapter.Holder>(Comparator()) {
-    class Comparator: DiffUtil.ItemCallback<ArtEntity>() {
-        override fun areItemsTheSame(oldItem: ArtEntity, newItem: ArtEntity): Boolean {
-            return oldItem.id == newItem.id
-        }
-        override fun areContentsTheSame(oldItem: ArtEntity, newItem: ArtEntity): Boolean {
-            return oldItem == newItem
-        }
-    }
+typealias FavoriteListener = (String, Boolean) -> Unit
+
+class HomeAdapter(
+    private val favoriteListener: FavoriteListener
+) : ListAdapter<ArtEntity, HomeAdapter.Holder>(ArtDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.art_item, parent, false)
-        return Holder(view)
+        val binding = ArtItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return Holder(binding, favoriteListener)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class Holder(view: View) : RecyclerView.ViewHolder(view) {
-        private val binding = ArtItemBinding.bind(view)
-
-        fun bind(art: ArtEntity) = with(binding) {
-            titleTv.text = art.title
-
-//            ImageLoader.load(artIm.context, art.headerImage.url, artIm)
-            ImageLoader.load(artIm.context, art.webImage.url, artIm, itemProgressBar)
+    override fun onBindViewHolder(
+        holder: Holder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            if (payloads[0] == true) {
+                holder.bindFavoriteState(getItem(position).isFavorite)
+            }
         }
     }
 
+    class Holder(
+        private val binding: ArtItemBinding,
+        private val favoriteListener: FavoriteListener
+    ) : RecyclerView.ViewHolder(binding.root) {
 
+        lateinit var art: ArtEntity
 
+        init {
+            binding.favoriteIcon.setOnClickListener {
+                favoriteListener(art.id, !it.isSelected)
+            }
+        }
 
+        fun bind(art: ArtEntity) {
+            this.art = art
+
+            ImageLoader.load(binding.artIm.context, art.webImage.url, binding.artIm, binding.itemProgressBar)
+            binding.titleTv.text = art.title
+            binding.favoriteIcon.isSelected = art.isFavorite
+        }
+
+        fun bindFavoriteState(isFavorite: Boolean) {
+            binding.favoriteIcon.isSelected = isFavorite
+        }
+    }
+
+    class ArtDiffCallback : DiffUtil.ItemCallback<ArtEntity>() {
+        override fun areItemsTheSame(oldItem: ArtEntity, newItem: ArtEntity): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: ArtEntity, newItem: ArtEntity): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun getChangePayload(oldItem: ArtEntity, newItem: ArtEntity): Any? {
+            return if (oldItem.isFavorite != newItem.isFavorite) true else null
+        }
+    }
 }

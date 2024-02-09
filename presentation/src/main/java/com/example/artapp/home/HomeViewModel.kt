@@ -1,6 +1,7 @@
 package com.example.artapp.home
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,16 +24,23 @@ class HomeViewModel : ViewModel() {
     private val getArtsUseCase by lazy(LazyThreadSafetyMode.NONE) {
         GetArtsUseCase(artRepository = ArtRepositoryImpl(artApi = RetrofitInstance.artApi))
     }
-
     val liveState = MutableLiveData<States>(States.Loading)
+    private var artsList: List<ArtEntity> = emptyList()
+
 
     init {
         loadArts()
     }
 
-    override fun onCleared() {
-        Log.d("Check", "vm cleared")
-        super.onCleared()
+    fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
+        artsList = artsList.map {
+            if (it.id == id) {
+                it.copy(isFavorite = isFavorite)
+            } else {
+                it
+            }
+        }
+        liveState.value = States.Data(artsList)
     }
 
     fun refreshData() {
@@ -44,7 +52,10 @@ class HomeViewModel : ViewModel() {
             liveState.value = States.Loading
 
             val result = getArtsUseCase.executeSafely(Unit).fold(
-                onSuccess = States::Data,
+                onSuccess = { arts ->
+                    artsList = arts
+                    States.Data(arts)
+                },
                 onFailure = {
                     States.Error
                 }
