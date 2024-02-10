@@ -5,57 +5,57 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.artapp.Adapter
 import com.example.artapp.FragmentManager
-import com.example.artapp.MainActivity
-import com.example.artapp.R
+import com.example.artapp.activities.MainActivity
+import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
 import com.example.artapp.details.DetailsFragment
-import com.example.domain.models.ArtEntity
 
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private val homeAdapter by lazy { HomeAdapter(this::toggleFavoriteStatus) }
-    private lateinit var viewModel: HomeViewModel
+    private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
+    private val viewModel: HomeViewModel by activityViewModels {
+        HomeViewModel.HomeViewModelFactory((context?.applicationContext as MainApp).database)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initUI()
-        initViewModel()
+        initRcView()
+        observeChanges()
+    }
+
+    private fun initRcView() {
+        binding.rcView.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcView.adapter = adapter
+    }
+
+    private fun observeChanges() {
+        viewModel.liveState.observe(viewLifecycleOwner) {
+            it.updateUI()
+        }
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshData()
         }
-        homeAdapter.setOnItemClickListener {
+
+        adapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putSerializable("key", it)
             }
             FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
         }
-    }
-
-    private fun initUI() {
-        binding.rcView.layoutManager = GridLayoutManager(requireContext(), 1)
-        binding.rcView.adapter = homeAdapter
-    }
-
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-        viewModel.liveState.observe(viewLifecycleOwner, Observer{
-            it.updateUI()
-        })
     }
 
     private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
@@ -67,7 +67,7 @@ class HomeFragment : Fragment() {
             binding.loadingBar.visibility = View.GONE
             binding.tvError.visibility = View.GONE
             binding.rcView.visibility = View.VISIBLE
-            homeAdapter.submitList(arts)
+            adapter.submitList(arts)
 
             binding.swipeRefreshLayout.isRefreshing = false
         }

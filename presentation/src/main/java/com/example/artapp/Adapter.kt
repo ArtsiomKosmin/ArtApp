@@ -1,19 +1,18 @@
-package com.example.artapp.home
+package com.example.artapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.artapp.ImageLoader
 import com.example.artapp.databinding.ArtItemBinding
 import com.example.domain.models.ArtEntity
 
 typealias FavoriteListener = (String, Boolean) -> Unit
 
-class HomeAdapter(
+class Adapter(
     private val favoriteListener: FavoriteListener
-) : ListAdapter<ArtEntity, HomeAdapter.Holder>(ArtDiffCallback()) {
+) : ListAdapter<ArtEntity, Adapter.Holder>(ArtDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val binding = ArtItemBinding.inflate(
@@ -59,7 +58,7 @@ class HomeAdapter(
         private val favoriteListener: FavoriteListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        lateinit var art: ArtEntity
+        private lateinit var art: ArtEntity
 
         init {
             binding.favoriteIcon.setOnClickListener {

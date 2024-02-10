@@ -1,17 +1,19 @@
 package com.example.artapp.home
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.data.repository.ArtRepositoryImpl
+import com.example.artapp.favorite.FavoriteStates
+import com.example.data.repository.ArtLocalRepositoryImpl
+import com.example.data.repository.ArtRemoteRepositoryImpl
+import com.example.data.source.local.AppDataBase
 import com.example.data.source.remote.RetrofitInstance
-import com.example.domain.useCase.GetArtsUseCase
+import com.example.domain.useCase.GetRemoteArtsUseCase
 import com.example.domain.models.ArtEntity
+import com.example.domain.useCase.LocalArtsUseCase
 import com.example.domain.useCase.base.executeSafely
 import kotlinx.coroutines.launch
-import java.io.FileOutputStream
 
 sealed class States {
     data object Loading : States()
@@ -20,13 +22,16 @@ sealed class States {
 }
 
 
-class HomeViewModel : ViewModel() {
-    private val getArtsUseCase by lazy(LazyThreadSafetyMode.NONE) {
-        GetArtsUseCase(artRepository = ArtRepositoryImpl(artApi = RetrofitInstance.artApi))
+class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
+    private val getRemoteArtsUseCase by lazy(LazyThreadSafetyMode.NONE) {
+        GetRemoteArtsUseCase(artRemoteRepository = ArtRemoteRepositoryImpl(artApi = RetrofitInstance.artApi))
+    }
+
+    private val localArtsUseCase by lazy {
+        LocalArtsUseCase(artLocalRepository = ArtLocalRepositoryImpl(dao = dataBase.getDao()))
     }
     val liveState = MutableLiveData<States>(States.Loading)
     private var artsList: List<ArtEntity> = emptyList()
-
 
     init {
         loadArts()
@@ -35,6 +40,7 @@ class HomeViewModel : ViewModel() {
     fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         artsList = artsList.map {
             if (it.id == id) {
+                viewModelScope.launch { localArtsUseCase.addAsFavorite(it) }
                 it.copy(isFavorite = isFavorite)
             } else {
                 it
@@ -51,7 +57,7 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             liveState.value = States.Loading
 
-            val result = getArtsUseCase.executeSafely(Unit).fold(
+            val result = getRemoteArtsUseCase.executeSafely(Unit).fold(
                 onSuccess = { arts ->
                     artsList = arts
                     States.Data(arts)
@@ -61,6 +67,16 @@ class HomeViewModel : ViewModel() {
                 }
             )
             liveState.value = result
+        }
+    }
+
+    class HomeViewModelFactory(private val dataBase: AppDataBase) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return HomeViewModel(dataBase) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

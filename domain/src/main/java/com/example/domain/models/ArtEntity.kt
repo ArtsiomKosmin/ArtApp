@@ -8,7 +8,7 @@ data class ArtEntity(
     val longTitle: String,
     val webImage: WebImage,
     val headerImage: HeaderImage,
-    val isFavorite: Boolean
+    var isFavorite: Boolean
 ): Serializable
 
 data class HeaderImage(

@@ -1,9 +1,10 @@
-package com.example.artapp
+package com.example.artapp.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
+import com.example.artapp.FragmentManager
+import com.example.artapp.R
 import com.example.artapp.databinding.ActivityMainBinding
 import com.example.artapp.favorite.FavouriteFragment
 import com.example.artapp.home.HomeFragment

@@ -14,7 +14,7 @@
         android:background="?attr/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Details"
+        app:title="@string/details"
         app:titleTextColor="@android:color/white" />
 
     <ImageView

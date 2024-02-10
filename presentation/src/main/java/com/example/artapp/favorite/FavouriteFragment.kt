@@ -5,20 +5,61 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.artapp.R
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.artapp.activities.MainApp
+import com.example.artapp.databinding.FragmentFavouriteBinding
+import com.example.artapp.Adapter
 
 class FavouriteFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private lateinit var binding: FragmentFavouriteBinding
+    private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
+    private val viewModel: FavouriteViewModel by activityViewModels {
+        FavouriteViewModel.FavouriteViewModelFactory((context?.applicationContext as MainApp).database)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourite, container, false)
+    ): View {
+        binding = FragmentFavouriteBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initRcView()
+        observeChanges()
+    }
+
+    private fun observeChanges() {
+        viewModel.favoriteLiveState.observe(viewLifecycleOwner) {
+            it.updateUI()
+        }
+    }
+    private fun initRcView() {
+        binding.favoriteRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.favoriteRecyclerView.adapter = adapter
+    }
+
+    private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
+        viewModel.toggleFavoriteStatus(id, isFavorite)
+    }
+
+    private fun FavoriteStates.updateUI() = when (this) {
+        is FavoriteStates.Data -> {
+            binding.favoriteProgressBar.visibility = View.GONE
+            binding.favoriteTextView.visibility = View.GONE
+            adapter.submitList(arts)
+        }
+        is FavoriteStates.Error -> {
+            binding.favoriteProgressBar.visibility = View.GONE
+            binding.favoriteTextView.visibility = View.VISIBLE
+        }
+        is FavoriteStates.Loading -> {
+            binding.favoriteProgressBar.visibility = View.VISIBLE
+            binding.favoriteTextView.visibility = View.GONE
+        }
     }
 
     companion object {
