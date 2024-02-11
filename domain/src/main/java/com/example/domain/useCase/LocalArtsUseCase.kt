@@ -18,4 +18,8 @@ class LocalArtsUseCase(
         artLocalRepository.insertArt(art)
     }
 
+    suspend fun deleteFromFavorite(art: ArtEntity) {
+        artLocalRepository.deleteCurrentArt(art.id)
+    }
+
 }

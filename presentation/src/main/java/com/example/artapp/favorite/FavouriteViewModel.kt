@@ -15,14 +15,14 @@ import kotlinx.coroutines.launch
 sealed class FavoriteStates {
     data class Data(val arts: List<ArtEntity>) : FavoriteStates()
     data object Error : FavoriteStates()
-    data object Loading: FavoriteStates()
+    data object Update : FavoriteStates()
 }
 
 class FavouriteViewModel(
     dataBase: AppDataBase
 ) : ViewModel() {
     private var localArtsList: List<ArtEntity> = emptyList()
-    val favoriteLiveState = MutableLiveData<FavoriteStates>(FavoriteStates.Loading)
+    val favoriteLiveState = MutableLiveData<FavoriteStates>()
     private val localArtsUseCase by lazy {
         LocalArtsUseCase(artLocalRepository = ArtLocalRepositoryImpl(dao = dataBase.getDao()))
     }
@@ -31,7 +31,7 @@ class FavouriteViewModel(
         loadLocalList()
     }
 
-    private fun loadLocalList() {
+    fun loadLocalList() {
         viewModelScope.launch {
             val result = localArtsUseCase.executeSafely(Unit).fold(
                 onSuccess = {
@@ -39,22 +39,21 @@ class FavouriteViewModel(
                     FavoriteStates.Data(it)
                 },
                 onFailure = {
-                    throw it
+                    FavoriteStates.Error
                 }
             )
             favoriteLiveState.value = result
         }
     }
 
-    fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
-        localArtsList = localArtsList.map {
-            if (it.id == id) {
-                it.copy(isFavorite = isFavorite)
-            } else {
-                it
+    fun toggleFavoriteStatus(id: String) {
+        localArtsList.find { it.id == id }?.let { deletedArt ->
+            localArtsList = localArtsList.filterNot { it.id == id }
+            viewModelScope.launch {
+                localArtsUseCase.deleteFromFavorite(deletedArt)
+                favoriteLiveState.value = FavoriteStates.Data(localArtsList)
             }
         }
-        favoriteLiveState.value = FavoriteStates.Data(localArtsList)
     }
 
     class FavouriteViewModelFactory(private val dataBase: AppDataBase) : ViewModelProvider.Factory {

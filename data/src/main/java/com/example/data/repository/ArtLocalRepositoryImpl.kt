@@ -16,4 +16,8 @@ class ArtLocalRepositoryImpl(
     override fun getAllArts(): List<ArtEntity> {
         return dao.getAllNotes().map { it.toDomain() }
     }
+
+    override suspend fun deleteCurrentArt(artID: String) {
+        return dao.deleteCurrentArt(artID)
+    }
 }

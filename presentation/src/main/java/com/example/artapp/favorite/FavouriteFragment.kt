@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentFavouriteBinding
 import com.example.artapp.Adapter
+import com.example.artapp.FragmentManager
+import com.example.artapp.activities.MainActivity
 
 class FavouriteFragment : Fragment() {
     private lateinit var binding: FragmentFavouriteBinding
@@ -36,14 +38,18 @@ class FavouriteFragment : Fragment() {
         viewModel.favoriteLiveState.observe(viewLifecycleOwner) {
             it.updateUI()
         }
+        binding.toolbar.setNavigationOnClickListener {
+            FragmentManager.popBackStack(requireActivity() as MainActivity)
+        }
     }
+
     private fun initRcView() {
         binding.favoriteRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.favoriteRecyclerView.adapter = adapter
     }
 
     private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
-        viewModel.toggleFavoriteStatus(id, isFavorite)
+        viewModel.toggleFavoriteStatus(id)
     }
 
     private fun FavoriteStates.updateUI() = when (this) {
@@ -52,13 +58,14 @@ class FavouriteFragment : Fragment() {
             binding.favoriteTextView.visibility = View.GONE
             adapter.submitList(arts)
         }
+
         is FavoriteStates.Error -> {
             binding.favoriteProgressBar.visibility = View.GONE
             binding.favoriteTextView.visibility = View.VISIBLE
         }
-        is FavoriteStates.Loading -> {
-            binding.favoriteProgressBar.visibility = View.VISIBLE
-            binding.favoriteTextView.visibility = View.GONE
+
+        is FavoriteStates.Update -> {
+            viewModel.loadLocalList()
         }
     }
 
