@@ -12,6 +12,7 @@ import com.example.artapp.databinding.FragmentFavouriteBinding
 import com.example.artapp.Adapter
 import com.example.artapp.FragmentManager
 import com.example.artapp.activities.MainActivity
+import com.example.artapp.details.DetailsFragment
 
 class FavouriteFragment : Fragment() {
     private lateinit var binding: FragmentFavouriteBinding
@@ -41,6 +42,15 @@ class FavouriteFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             FragmentManager.popBackStack(requireActivity() as MainActivity)
         }
+        adapter.setOnItemClickListener {
+            val bundle = Bundle().apply {
+                putSerializable("key", it)
+            }
+            FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadLocalList()
+        }
     }
 
     private fun initRcView() {
@@ -57,11 +67,15 @@ class FavouriteFragment : Fragment() {
             binding.favoriteProgressBar.visibility = View.GONE
             binding.favoriteTextView.visibility = View.GONE
             adapter.submitList(arts)
+
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         is FavoriteStates.Error -> {
             binding.favoriteProgressBar.visibility = View.GONE
             binding.favoriteTextView.visibility = View.VISIBLE
+
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         is FavoriteStates.Update -> {

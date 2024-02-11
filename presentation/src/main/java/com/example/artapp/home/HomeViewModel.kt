@@ -4,8 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.artapp.favorite.FavoriteStates
-import com.example.artapp.favorite.FavouriteFragment
 import com.example.data.repository.ArtLocalRepositoryImpl
 import com.example.data.repository.ArtRemoteRepositoryImpl
 import com.example.data.source.local.AppDataBase
