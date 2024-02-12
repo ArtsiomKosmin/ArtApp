@@ -38,8 +38,8 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
 
     private fun observeAndLoadArts() {
         viewModelScope.launch {
+            remoteArtsResult = getRemoteArtsUseCase.executeSafely(Unit)
             allFavoriteArts.collect { localArtList ->
-                remoteArtsResult = getRemoteArtsUseCase.executeSafely(Unit)
                 val result = remoteArtsResult!!.fold(
                     onSuccess = { remoteArts ->
                         val artsWithFavorites = remoteArts.map { remoteArt ->
