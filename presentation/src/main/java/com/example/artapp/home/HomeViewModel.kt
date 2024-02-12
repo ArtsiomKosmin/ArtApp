@@ -1,11 +1,8 @@
 package com.example.artapp.home
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.ArtLocalRepositoryImpl
 import com.example.data.repository.ArtRemoteRepositoryImpl
@@ -15,6 +12,7 @@ import com.example.domain.useCase.GetRemoteArtsUseCase
 import com.example.domain.models.ArtEntity
 import com.example.domain.useCase.LocalArtsUseCase
 import com.example.domain.useCase.base.executeSafely
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 sealed class States {
@@ -30,55 +28,49 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     private val localArtsUseCase by lazy {
         LocalArtsUseCase(artLocalRepository = ArtLocalRepositoryImpl(dao = dataBase.getDao()))
     }
-    val allFavoriteArts: LiveData<List<ArtEntity>> =
-        localArtsUseCase.getAllArts().asLiveData()
+    private val allFavoriteArts: Flow<List<ArtEntity>> = localArtsUseCase.getAllArts()
     val liveState = MutableLiveData<States>(States.Loading)
-    private var artsList: List<ArtEntity> = emptyList()
 
     init {
-        loadArts()
+        observeAndLoadArts()
     }
 
-    fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
-        artsList.map { art ->
-            if (art.id == id) {
-                val updatedArt = art.copy(isFavorite = isFavorite)
-                viewModelScope.launch {
-                    if (isFavorite) {
-                        localArtsUseCase.addAsFavorite(updatedArt)
-                    } else {
-                        localArtsUseCase.deleteFromFavorite(updatedArt)
+    private fun observeAndLoadArts() {
+        viewModelScope.launch {
+            allFavoriteArts.collect { localArtList ->
+                val result = getRemoteArtsUseCase.executeSafely(Unit).fold(
+                    onSuccess = { remoteArts ->
+                        val artsWithFavorites = remoteArts.map { remoteArt ->
+                            val isFavorite = localArtList.any { it.id == remoteArt.id }
+                            remoteArt.copy(isFavorite = isFavorite)
+                        }
+                        States.Data(artsWithFavorites)
+                    },
+                    onFailure = {
+                        States.Error
                     }
-                }
-                updatedArt
-            } else {
-                art
+                )
+                liveState.value = result
             }
         }
     }
 
     fun refreshData() {
         liveState.value = States.Loading
-        loadArts()
+        observeAndLoadArts()
     }
 
-    fun loadArts() {
+    fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         viewModelScope.launch {
-            val result = getRemoteArtsUseCase.executeSafely(Unit).fold(
-                onSuccess = { remoteArts ->
-                    val artsWithFavorites = remoteArts.map { remoteArt ->
-                        val isFavorite =
-                            allFavoriteArts.value?.any { localArt -> localArt.id == remoteArt.id } ?: false
-                        remoteArt.copy(isFavorite = isFavorite)
-                    }
-                    artsList = artsWithFavorites
-                    States.Data(artsWithFavorites)
-                },
-                onFailure = {
-                    States.Error
+            val art = getRemoteArtsUseCase.executeSafely(Unit).getOrNull()?.find { it.id == id }
+            art?.let { remoteArt ->
+                val updatedArt = remoteArt.copy(isFavorite = isFavorite)
+                if (isFavorite) {
+                    localArtsUseCase.addAsFavorite(updatedArt)
+                } else {
+                    localArtsUseCase.deleteFromFavorite(updatedArt)
                 }
-            )
-            liveState.value = result
+            }
         }
     }
 

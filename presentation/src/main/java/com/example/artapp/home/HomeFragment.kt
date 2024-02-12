@@ -45,9 +45,6 @@ class HomeFragment : Fragment() {
         viewModel.liveState.observe(viewLifecycleOwner) {
             it.updateUI()
         }
-        viewModel.allFavoriteArts.observe(viewLifecycleOwner) {
-            viewModel.loadArts()
-        }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshData()
