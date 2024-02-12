@@ -30,6 +30,7 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     }
     private val allFavoriteArts: Flow<List<ArtEntity>> = localArtsUseCase.getAllArts()
     val liveState = MutableLiveData<States>(States.Loading)
+    private var remoteArtsResult: Result<List<ArtEntity>>? = null
 
     init {
         observeAndLoadArts()
@@ -38,7 +39,8 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     private fun observeAndLoadArts() {
         viewModelScope.launch {
             allFavoriteArts.collect { localArtList ->
-                val result = getRemoteArtsUseCase.executeSafely(Unit).fold(
+                remoteArtsResult = getRemoteArtsUseCase.executeSafely(Unit)
+                val result = remoteArtsResult!!.fold(
                     onSuccess = { remoteArts ->
                         val artsWithFavorites = remoteArts.map { remoteArt ->
                             val isFavorite = localArtList.any { it.id == remoteArt.id }
@@ -62,8 +64,7 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
 
     fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         viewModelScope.launch {
-            val art = getRemoteArtsUseCase.executeSafely(Unit).getOrNull()?.find { it.id == id }
-            art?.let { remoteArt ->
+            remoteArtsResult?.getOrNull()?.find { it.id == id }?.let { remoteArt ->
                 val updatedArt = remoteArt.copy(isFavorite = isFavorite)
                 if (isFavorite) {
                     localArtsUseCase.addAsFavorite(updatedArt)
@@ -84,3 +85,4 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
         }
     }
 }
+
