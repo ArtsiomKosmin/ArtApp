@@ -1,57 +1,34 @@
 package com.example.artapp.favorite
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.ArtLocalRepositoryImpl
 import com.example.data.source.local.AppDataBase
 import com.example.domain.models.ArtEntity
 import com.example.domain.useCase.LocalArtsUseCase
 import com.example.domain.useCase.base.executeSafely
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
-
-
-sealed class FavoriteStates {
-    data class Data(val arts: List<ArtEntity>) : FavoriteStates()
-    data object Error : FavoriteStates()
-    data object Update : FavoriteStates()
-}
 
 class FavouriteViewModel(
     dataBase: AppDataBase
 ) : ViewModel() {
-    private var localArtsList: List<ArtEntity> = emptyList()
-    val favoriteLiveState = MutableLiveData<FavoriteStates>()
     private val localArtsUseCase by lazy {
         LocalArtsUseCase(artLocalRepository = ArtLocalRepositoryImpl(dao = dataBase.getDao()))
     }
+    val allFavoriteArts: LiveData<List<ArtEntity>> = localArtsUseCase.getAllArts().asLiveData()
 
-    init {
-        loadLocalList()
-    }
-
-    fun loadLocalList() {
-        viewModelScope.launch {
-            val result = localArtsUseCase.executeSafely(Unit).fold(
-                onSuccess = {
-                    localArtsList = it
-                    FavoriteStates.Data(it)
-                },
-                onFailure = {
-                    FavoriteStates.Error
-                }
-            )
-            favoriteLiveState.value = result
-        }
-    }
 
     fun toggleFavoriteStatus(id: String) {
-        localArtsList.find { it.id == id }?.let { deletedArt ->
-            localArtsList = localArtsList.filterNot { it.id == id }
+        allFavoriteArts.value?.find { it.id == id }.let {
             viewModelScope.launch {
-                localArtsUseCase.deleteFromFavorite(deletedArt)
-                favoriteLiveState.value = FavoriteStates.Data(localArtsList)
+                if (it != null) {
+                    localArtsUseCase.deleteFromFavorite(it)
+                }
             }
         }
     }

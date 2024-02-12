@@ -36,8 +36,8 @@ class FavouriteFragment : Fragment() {
     }
 
     private fun observeChanges() {
-        viewModel.favoriteLiveState.observe(viewLifecycleOwner) {
-            it.updateUI()
+        viewModel.allFavoriteArts.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
         }
         binding.toolbar.setNavigationOnClickListener {
             FragmentManager.popBackStack(requireActivity() as MainActivity)
@@ -48,9 +48,6 @@ class FavouriteFragment : Fragment() {
             }
             FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
         }
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadLocalList()
-        }
     }
 
     private fun initRcView() {
@@ -60,27 +57,6 @@ class FavouriteFragment : Fragment() {
 
     private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         viewModel.toggleFavoriteStatus(id)
-    }
-
-    private fun FavoriteStates.updateUI() = when (this) {
-        is FavoriteStates.Data -> {
-            binding.favoriteProgressBar.visibility = View.GONE
-            binding.favoriteTextView.visibility = View.GONE
-            adapter.submitList(arts)
-
-            binding.swipeRefreshLayout.isRefreshing = false
-        }
-
-        is FavoriteStates.Error -> {
-            binding.favoriteProgressBar.visibility = View.GONE
-            binding.favoriteTextView.visibility = View.VISIBLE
-
-            binding.swipeRefreshLayout.isRefreshing = false
-        }
-
-        is FavoriteStates.Update -> {
-            viewModel.loadLocalList()
-        }
     }
 
     companion object {

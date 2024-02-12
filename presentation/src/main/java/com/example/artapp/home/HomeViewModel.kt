@@ -1,8 +1,11 @@
 package com.example.artapp.home
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.ArtLocalRepositoryImpl
 import com.example.data.repository.ArtRemoteRepositoryImpl
@@ -20,7 +23,6 @@ sealed class States {
     data object Error : States()
 }
 
-
 class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     private val getRemoteArtsUseCase by lazy(LazyThreadSafetyMode.NONE) {
         GetRemoteArtsUseCase(artRemoteRepository = ArtRemoteRepositoryImpl(artApi = RetrofitInstance.artApi))
@@ -28,6 +30,8 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     private val localArtsUseCase by lazy {
         LocalArtsUseCase(artLocalRepository = ArtLocalRepositoryImpl(dao = dataBase.getDao()))
     }
+    val allFavoriteArts: LiveData<List<ArtEntity>> =
+        localArtsUseCase.getAllArts().asLiveData()
     val liveState = MutableLiveData<States>(States.Loading)
     private var artsList: List<ArtEntity> = emptyList()
 
@@ -36,7 +40,7 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
     }
 
     fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
-        artsList = artsList.map { art ->
+        artsList.map { art ->
             if (art.id == id) {
                 val updatedArt = art.copy(isFavorite = isFavorite)
                 viewModelScope.launch {
@@ -51,22 +55,20 @@ class HomeViewModel(dataBase: AppDataBase) : ViewModel() {
                 art
             }
         }
-        liveState.value = States.Data(artsList)
     }
 
     fun refreshData() {
+        liveState.value = States.Loading
         loadArts()
     }
 
-    private fun loadArts() {
+    fun loadArts() {
         viewModelScope.launch {
-            liveState.value = States.Loading
-
             val result = getRemoteArtsUseCase.executeSafely(Unit).fold(
                 onSuccess = { remoteArts ->
-                    val localArts = localArtsUseCase.execute(Unit)
                     val artsWithFavorites = remoteArts.map { remoteArt ->
-                        val isFavorite = localArts.any { localArt -> localArt.id == remoteArt.id }
+                        val isFavorite =
+                            allFavoriteArts.value?.any { localArt -> localArt.id == remoteArt.id } ?: false
                         remoteArt.copy(isFavorite = isFavorite)
                     }
                     artsList = artsWithFavorites
