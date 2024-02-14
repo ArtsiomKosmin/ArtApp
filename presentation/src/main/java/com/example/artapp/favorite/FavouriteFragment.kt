@@ -32,6 +32,10 @@ class FavouriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRcView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         observeChanges()
     }
 
@@ -48,6 +52,11 @@ class FavouriteFragment : Fragment() {
             }
             FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.allFavoriteArts.removeObservers(viewLifecycleOwner)
     }
 
     private fun initRcView() {

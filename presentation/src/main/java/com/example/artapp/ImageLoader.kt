@@ -21,7 +21,7 @@ object ImageLoader {
     fun load(context: Context, imageUrl: String, imageView: ImageView, progressBar: ProgressBar) {
         val requestOptions = RequestOptions()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .transform(FitCenter()).downsample(DownsampleStrategy.CENTER_INSIDE).override(800, 600)
+            .transform(FitCenter()).downsample(DownsampleStrategy.CENTER_INSIDE).override(800)
 
         Glide.with(context)
             .load(imageUrl)

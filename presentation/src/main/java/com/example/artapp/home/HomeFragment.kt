@@ -33,6 +33,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRcView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         observeChanges()
     }
 
@@ -60,6 +64,11 @@ class HomeFragment : Fragment() {
 
     private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         viewModel.toggleFavoriteStatus(id, isFavorite)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.liveState.removeObservers(viewLifecycleOwner)
     }
 
     private fun States.updateUI() = when (this) {
