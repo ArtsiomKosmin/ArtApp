@@ -2,12 +2,14 @@ package com.example.artapp.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import com.example.artapp.FragmentManager
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.artapp.R
 import com.example.artapp.databinding.ActivityMainBinding
-import com.example.artapp.favorite.FavouriteFragment
-import com.example.artapp.home.HomeFragment
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -17,28 +19,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (savedInstanceState == null) {
-            showHomeFragment()
-        }
-        setBottomNavListener()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavigation.setupWithNavController(navController)
     }
-
-    private fun setBottomNavListener() {
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.home -> FragmentManager.setFragment(HomeFragment.getInstance(), this)
-                R.id.favorite -> FragmentManager.setFragment(FavouriteFragment.newInstance(), this)
-                R.id.settings -> Log.d("Check", "settings")
-            }
-            true
-        }
-    }
-
-    private fun showHomeFragment() {
-        FragmentManager.setFragment(HomeFragment.getInstance(), this)
-    }
-
-
 }
 
 

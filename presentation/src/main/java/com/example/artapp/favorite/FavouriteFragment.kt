@@ -1,18 +1,18 @@
 package com.example.artapp.favorite
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentFavouriteBinding
 import com.example.artapp.Adapter
-import com.example.artapp.FragmentManager
-import com.example.artapp.activities.MainActivity
-import com.example.artapp.details.DetailsFragment
 
 class FavouriteFragment : Fragment() {
     private lateinit var binding: FragmentFavouriteBinding
@@ -39,18 +39,19 @@ class FavouriteFragment : Fragment() {
         observeChanges()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeChanges() {
         viewModel.allFavoriteArts.observe(viewLifecycleOwner) {
             adapter.submitList(it)
+            Log.d("Check", "all observe: ${it.size}")
         }
         binding.toolbar.setNavigationOnClickListener {
-            FragmentManager.popBackStack(requireActivity() as MainActivity)
+            findNavController().popBackStack()
         }
         adapter.setOnItemClickListener {
-            val bundle = Bundle().apply {
-                putSerializable("key", it)
-            }
-            FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
+            val action = FavouriteFragmentDirections.actionFavouriteFragmentToDetailsFragment(it)
+            Log.d("Check", "click on item: ${it}")
+            findNavController().navigate(action)
         }
     }
 

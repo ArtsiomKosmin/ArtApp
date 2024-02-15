@@ -6,16 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.example.artapp.FragmentManager
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.artapp.ImageLoader
-import com.example.artapp.activities.MainActivity
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentDetailsBinding
 import com.example.domain.models.ArtEntity
 
 class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
-    private lateinit var artEntity: ArtEntity
+    private val navArgs: DetailsFragmentArgs by navArgs()
     private val viewModel: DetailsViewModel by activityViewModels {
         DetailsViewModel.DetailsViewModelFactory((context?.applicationContext as MainApp).database)
     }
@@ -30,7 +30,6 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        artEntity = arguments?.getSerializable("key") as? ArtEntity ?: return
     }
 
     override fun onResume() {
@@ -40,20 +39,20 @@ class DetailsFragment : Fragment() {
 
     private fun observeChanges() {
         viewModel.allFavoriteArts.observe(viewLifecycleOwner) { favoriteArts ->
-            val isFavorite = favoriteArts.any { it.id == artEntity.id }
+            val isFavorite = favoriteArts.any { it.id == navArgs.ArtEntity.id }
             binding.favoriteButton.isSelected = isFavorite
-            artEntity.isFavorite = isFavorite
+            navArgs.ArtEntity.isFavorite = isFavorite
         }
 
         binding.favoriteButton.setOnClickListener {
-            viewModel.favoriteOperations(artEntity)
+            viewModel.favoriteOperations(navArgs.ArtEntity)
         }
 
         binding.toolbar.setNavigationOnClickListener {
-            FragmentManager.popBackStack(requireActivity() as MainActivity)
+            findNavController().popBackStack()
         }
 
-        loadInfo(artEntity)
+        loadInfo(navArgs.ArtEntity)
     }
 
     override fun onPause() {

@@ -1,5 +1,6 @@
 package com.example.artapp.favorite
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,12 +23,12 @@ class FavouriteViewModel(
     }
     val allFavoriteArts: LiveData<List<ArtEntity>> = localArtsUseCase.getAllArts().asLiveData()
 
-
     fun toggleFavoriteStatus(id: String) {
         allFavoriteArts.value?.find { it.id == id }.let {
             viewModelScope.launch {
                 if (it != null) {
                     localArtsUseCase.deleteFromFavorite(it)
+                    Log.d("Check", "toggle deleted: ${it}")
                 }
             }
         }

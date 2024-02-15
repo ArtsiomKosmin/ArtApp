@@ -6,13 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.artapp.Adapter
-import com.example.artapp.FragmentManager
-import com.example.artapp.activities.MainActivity
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
-import com.example.artapp.details.DetailsFragment
 
 
 class HomeFragment : Fragment() {
@@ -55,10 +53,8 @@ class HomeFragment : Fragment() {
         }
 
         adapter.setOnItemClickListener {
-            val bundle = Bundle().apply {
-                putSerializable("key", it)
-            }
-            FragmentManager.setFragment(DetailsFragment.newInstance(), requireActivity() as MainActivity, bundle)
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailsFragment(it)
+            findNavController().navigate(action)
         }
     }
 

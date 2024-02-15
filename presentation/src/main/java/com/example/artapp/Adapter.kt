@@ -1,6 +1,5 @@
 package com.example.artapp
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -15,6 +14,8 @@ class Adapter(
     private val favoriteListener: FavoriteListener
 ) : ListAdapter<ArtEntity, Adapter.Holder>(ArtDiffCallback()) {
 
+    private var onItemClickListener: ((ArtEntity) -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val binding = ArtItemBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -27,8 +28,6 @@ class Adapter(
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
-
-    private var onItemClickListener: ((ArtEntity) -> Unit)? = null
 
     override fun onBindViewHolder(
         holder: Holder,
@@ -44,9 +43,7 @@ class Adapter(
         }
 
         holder.itemView.setOnClickListener {
-            onItemClickListener?.let {
-                it(getItem(position))
-            }
+            onItemClickListener?.invoke(getItem(holder.adapterPosition))
         }
     }
 

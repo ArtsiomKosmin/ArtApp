@@ -10,11 +10,3 @@ data class ArtEntity(
     val headerImage: HeaderImage,
     var isFavorite: Boolean
 ): Serializable
-
-data class HeaderImage(
-    val url: String
-)
-
-data class WebImage(
-    val url: String
-)
