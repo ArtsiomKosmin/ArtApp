@@ -2,6 +2,8 @@ package com.example.artapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -66,6 +68,9 @@ class Adapter(
 
         fun bind(art: ArtEntity) {
             this.art = art
+
+            val animation = AnimationUtils.loadAnimation(binding.root.context, R.anim.recycler_anim)
+            binding.root.startAnimation(animation)
 
             ImageLoader.load(binding.artIm.context, art.webImage.url, binding.artIm, binding.itemProgressBar)
             binding.titleTv.text = art.title
