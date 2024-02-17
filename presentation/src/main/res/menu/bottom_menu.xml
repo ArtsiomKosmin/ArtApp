@@ -14,7 +14,7 @@
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/settings"
+        android:id="@+id/navigation_settings"
         android:title="@string/settings"
         android:icon="@drawable/ic_settings"
         app:showAsAction="ifRoom"

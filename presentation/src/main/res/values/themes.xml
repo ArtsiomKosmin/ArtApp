@@ -1,9 +1,47 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ArtApp" parent="Theme.Material3.DayNight.NoActionBar">
 
+    <style name="BottomNavigationTheme" parent="Widget.Design.BottomNavigationView">
+        <item name="itemIconTint">@color/white</item>
+        <item name="itemTextColor">@color/white</item>
+        <item name="itemHorizontalTranslationEnabled">false</item>
+        <item name="android:background">@color/primary_color</item>
     </style>
 
+    <style name="Theme.ArtApp.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryVariant">@color/primary_color</item>
+        <item name="colorSecondary">@color/primary_color</item>
+        <item name="colorSecondaryVariant">@color/primary_color</item>
+        <item name="colorAccent">@color/primary_color</item>
+        <item name="bottomNavigationStyle">@style/BottomNavigationTheme</item>
+        <item name="cardViewTextColor">@color/black</item>
+        <item name="favoriteIconColor">@color/black</item>
+        <item name="themeIconColor">@color/black</item>
+        <item name="toolbarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/primary_color</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+    </style>
 
-    <style name="Theme.ArtApp" parent="Base.Theme.ArtApp" />
+    <style name="BottomNavigationThemeTwo" parent="Widget.Design.BottomNavigationView">
+        <item name="itemIconTint">@color/grey</item>
+        <item name="itemTextColor">@color/grey</item>
+        <item name="itemHorizontalTranslationEnabled">false</item>
+        <item name="android:background">@color/secondary_color</item>
+    </style>
+
+    <style name="Theme.ArtApp.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/secondary_color</item>
+        <item name="colorPrimaryVariant">@color/secondary_color</item>
+        <item name="colorSecondary">@color/secondary_color</item>
+        <item name="colorSecondaryVariant">@color/secondary_color</item>
+        <item name="colorAccent">@color/grey</item>
+        <item name="favoriteIconColor">@color/grey</item>
+        <item name="cardViewTextColor">@color/grey</item>
+        <item name="themeIconColor">@color/grey</item>
+        <item name="toolbarColor">@color/grey</item>
+        <item name="android:navigationBarColor">@color/secondary_color</item>
+        <item name="bottomNavigationStyle">@style/BottomNavigationThemeTwo</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+    </style>
 </resources>

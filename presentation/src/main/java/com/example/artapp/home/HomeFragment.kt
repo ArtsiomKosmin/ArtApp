@@ -1,5 +1,6 @@
 package com.example.artapp.home
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.artapp.Adapter
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
@@ -16,6 +20,7 @@ import com.example.artapp.databinding.FragmentHomeBinding
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
+    private lateinit var pref: SharedPreferences
     private val viewModel: HomeViewModel by activityViewModels {
         HomeViewModel.HomeViewModelFactory((context?.applicationContext as MainApp).database)
     }
@@ -30,7 +35,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRcView()
+        init()
     }
 
     override fun onResume() {
@@ -38,9 +43,18 @@ class HomeFragment : Fragment() {
         observeChanges()
     }
 
-    private fun initRcView() {
-        binding.rcView.layoutManager = LinearLayoutManager(requireContext())
+    private fun init() {
+        pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        binding.rcView.layoutManager = getLayoutManager()
         binding.rcView.adapter = adapter
+    }
+
+    private fun getLayoutManager(): RecyclerView.LayoutManager {
+        return if (pref.getString("arts_style_key", "linear") == "linear") {
+            LinearLayoutManager(requireActivity())
+        } else {
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        }
     }
 
     private fun observeChanges() {

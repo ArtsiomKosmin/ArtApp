@@ -40,10 +40,11 @@
             android:id="@+id/favoriteIcon"
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:src="@drawable/ic_favourite_item"
             android:background="@android:color/transparent"
+            android:src="@drawable/ic_favourite_item"
+            app:tint="?attr/favoriteIconColor"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/title_tv"
@@ -51,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:textColor="#000000"
+            android:textColor="?attr/cardViewTextColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

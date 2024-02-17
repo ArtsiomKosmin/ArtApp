@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="cardViewTextColor" format="color" />
+    <attr name="favoriteIconColor" format="color" />
+    <attr name="themeIconColor" format="color" />
+    <attr name="toolbarColor" format="color" />
+</resources>
