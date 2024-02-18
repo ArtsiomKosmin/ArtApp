@@ -10,7 +10,7 @@ import retrofit2.http.Query
 interface ArtApi {
     @GET("collection")
     suspend fun getAllArts(
-        @Query("key") apiKey: String = API_KEY,
-        @Query("involvedMaker") involvedMaker: String = INVOLVED_MARKER
+        @Query("involvedMaker") involvedMaker: String = INVOLVED_MARKER,
+        @Query("p") page: Int
     ): Response<ArtsResponse>
 }

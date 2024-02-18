@@ -2,7 +2,7 @@
 <resources>
     <string-array name="art_style_array">
         <item>Linear</item>
-        <item>Staggered-grid</item>
+        <item>Grid</item>
     </string-array>
     <string-array name="art_style_values">
         <item>linear</item>

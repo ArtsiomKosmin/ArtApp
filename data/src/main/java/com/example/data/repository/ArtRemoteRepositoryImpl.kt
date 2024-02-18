@@ -8,8 +8,8 @@ import com.example.domain.repository.ArtRemoteRepository
 class ArtRemoteRepositoryImpl(
     private val artApi: ArtApi
 ): ArtRemoteRepository {
-    override suspend fun getArtObjects(): List<ArtEntity> {
-        val allArts = artApi.getAllArts()
+    override suspend fun getArtObjects(page: Int): List<ArtEntity> {
+        val allArts = artApi.getAllArts(page = page)
         if (allArts.isSuccessful) {
             return allArts.body()!!.artObjects.map { it.toDomain() }
         } else {

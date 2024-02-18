@@ -6,8 +6,8 @@ import com.example.domain.useCase.base.UseCase
 
 class GetRemoteArtsUseCase(
     private val artRemoteRepository: ArtRemoteRepository
-): UseCase <Unit, List<ArtEntity>> {
-    override suspend fun execute(params: Unit) : List<ArtEntity> {
-        return artRemoteRepository.getArtObjects()
+): UseCase <Int, List<ArtEntity>> {
+    override suspend fun execute(params: Int) : List<ArtEntity> {
+        return artRemoteRepository.getArtObjects(page = params)
     }
 }
