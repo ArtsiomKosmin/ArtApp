@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">ArtApp</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="favourite">Favourites</string>
+    <string name="error">Error</string>
+    <string name="details">Details</string>
+    <string name="choose_arts_style">Choose arts style</string>
+    <string name="choose_theme">Choose theme</string>
 </resources>

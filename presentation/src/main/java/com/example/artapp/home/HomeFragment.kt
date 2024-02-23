@@ -1,40 +1,41 @@
 package com.example.artapp.home
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.artapp.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.artapp.Adapter
+import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
-import com.example.domain.entity.ArtEntity
+import javax.inject.Inject
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class HomeFragment : Fragment() {
-//    private var param1: String? = null
-//    private var param2: String? = null
+    @Inject
+    lateinit var viewModelFactory: HomeViewModel.HomeViewModelFactory
     private lateinit var binding: FragmentHomeBinding
+    private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
+    private lateinit var pref: SharedPreferences
+    private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
-    //check
-    private val artList = arrayListOf<ArtEntity>(ArtEntity(0, "aaaa"), ArtEntity(1, "bbbbb"), ArtEntity(2, "cccc"))
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
+    private val paginationListener = PaginationListener {
+        viewModel.loadRemoteArts()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentHomeBinding.inflate(inflater)
+    ): View {
+        (requireActivity().application as MainApp).appComponent.injectHome(this)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -43,21 +44,75 @@ class HomeFragment : Fragment() {
         init()
     }
 
+    override fun onResume() {
+        super.onResume()
+        observeChanges()
+    }
+
     private fun init() {
-        binding.apply {
-            rcView.layoutManager = GridLayoutManager(context, 2)
-            rcView.adapter = ArtAdapter(artList)
+        pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        binding.rcView.layoutManager = getLayoutManager()
+        binding.rcView.adapter = adapter
+        binding.rcView.addOnScrollListener(paginationListener)
+    }
+
+    private fun getLayoutManager(): RecyclerView.LayoutManager {
+        return if (pref.getString("arts_style_key", "linear") == "linear") {
+            LinearLayoutManager(requireActivity())
+        } else {
+            GridLayoutManager(requireContext(), 2)
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun observeChanges() {
+        viewModel.liveState.observe(viewLifecycleOwner) {
+            it.updateUI()
+            paginationListener.setLoading(false)
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshData()
+        }
+
+        adapter.setOnItemClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailsFragment(it)
+            findNavController().navigate(action)
+        }
+    }
+
+    private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
+        viewModel.toggleFavoriteStatus(id, isFavorite)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.liveState.removeObservers(viewLifecycleOwner)
+        binding.rcView.removeOnScrollListener(paginationListener)
+    }
+
+    private fun States.updateUI() = when (this) {
+        is States.Data -> {
+            binding.loadingBar.visibility = View.GONE
+            binding.tvError.visibility = View.GONE
+            binding.rcView.visibility = View.VISIBLE
+
+            adapter.submitList(arts)
+
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+
+        is States.Loading -> {
+            binding.loadingBar.visibility = View.VISIBLE
+            binding.tvError.visibility = View.GONE
+            binding.rcView.visibility = View.GONE
+        }
+
+        is States.Error -> {
+            binding.loadingBar.visibility = View.GONE
+            binding.tvError.visibility = View.VISIBLE
+            binding.rcView.visibility = View.GONE
+
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/settings"/>
+    <ListPreference
+        android:defaultValue="linear"
+        android:entries="@array/art_style_array"
+        android:entryValues="@array/art_style_values"
+        android:key="arts_style_key"
+        app:useSimpleSummaryProvider="true"
+        android:icon="@drawable/ic_style_settings"
+        android:title="@string/choose_arts_style" />
+    <ListPreference
+        android:defaultValue="light"
+        android:entries="@array/theme_array"
+        android:entryValues="@array/theme_values"
+        android:icon="@drawable/ic_theme"
+        app:useSimpleSummaryProvider="true"
+        android:key="theme_key"
+        android:title="@string/choose_theme" />
+</PreferenceScreen>
