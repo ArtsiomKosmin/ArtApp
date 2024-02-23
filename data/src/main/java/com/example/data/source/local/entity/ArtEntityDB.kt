@@ -22,9 +22,6 @@ data class ArtEntityDB(
     @ColumnInfo(name = "webImageUrl")
     val webImageUrl: String,
 
-    @ColumnInfo(name = "headerImageUrl")
-    val headerImageUrl: String,
-
     @ColumnInfo(name = "isFavorite")
     val isFavorite: Boolean
 ) : Serializable

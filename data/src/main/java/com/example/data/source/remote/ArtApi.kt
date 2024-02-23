@@ -10,6 +10,7 @@ interface ArtApi {
     @GET("collection")
     suspend fun getAllArts(
         @Query("involvedMaker") involvedMaker: String = INVOLVED_MARKER,
-        @Query("p") page: Int
+        @Query("p") page: Int,
+        @Query("imgonly")imageOnly: String = "True"
     ): Response<ArtsResponse>
 }

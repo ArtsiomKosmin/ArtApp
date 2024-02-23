@@ -25,7 +25,7 @@ object ImageLoader {
         if (isFavorite) {
             requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL)
         } else {
-            requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
+            requestOptions.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
         }
 
         Glide.with(context)
@@ -38,6 +38,7 @@ object ImageLoader {
                     target: Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
+                    imageView.setImageResource(R.drawable.ic_error)
                     progressBar.visibility = View.GONE
                     return false
                 }
