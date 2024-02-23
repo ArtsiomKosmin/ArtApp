@@ -1,5 +1,5 @@
 # ArtApp
-ArtApp is a mobile application that provides access to the Cooper Hewitt art collection.
+ArtApp is a mobile application that provides access to the Rembrandt art collection.
 
 # Application structure:
 1. Home - when the application is opened, the user is directed to a page containing all works of art.
@@ -13,7 +13,6 @@ ArtApp is a mobile application that provides access to the Cooper Hewitt art col
 - Glide
 - Coroutines
 - Dagger
-- 
 
 # API
 API: https://data.rijksmuseum.nl/
