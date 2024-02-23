@@ -41,18 +41,15 @@ class FavouriteFragment : Fragment() {
         observeChanges()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun observeChanges() {
         viewModel.allFavoriteArts.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-            Log.d("Check", "all observe: ${it.size}")
         }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
         adapter.setOnItemClickListener {
             val action = FavouriteFragmentDirections.actionFavouriteFragmentToDetailsFragment(it)
-            Log.d("Check", "click on item: ${it}")
             findNavController().navigate(action)
         }
     }
