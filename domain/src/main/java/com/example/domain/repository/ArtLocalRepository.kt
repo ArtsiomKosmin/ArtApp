@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface ArtLocalRepository {
     suspend fun insertArt(art: ArtEntity)
     fun getAllArts(): Flow<List<ArtEntity>>
-    suspend fun deleteCurrentArt(art: String)
+    suspend fun deleteCurrentArt(artId: String)
 }

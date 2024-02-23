@@ -7,24 +7,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentFavouriteBinding
 import com.example.artapp.Adapter
+import javax.inject.Inject
 
 class FavouriteFragment : Fragment() {
+    @Inject
+    lateinit var viewModelFactory: FavouriteViewModel.FavouriteViewModelFactory
     private lateinit var binding: FragmentFavouriteBinding
     private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
-    private val viewModel: FavouriteViewModel by activityViewModels {
-        FavouriteViewModel.FavouriteViewModelFactory((context?.applicationContext as MainApp).database)
-    }
+    private val viewModel: FavouriteViewModel by viewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        (requireActivity().application as MainApp).appComponent.injectFavorite(this)
         binding = FragmentFavouriteBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -67,10 +69,5 @@ class FavouriteFragment : Fragment() {
 
     private fun toggleFavoriteStatus(id: String, isFavorite: Boolean) {
         viewModel.toggleFavoriteStatus(id)
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance() = FavouriteFragment()
     }
 }

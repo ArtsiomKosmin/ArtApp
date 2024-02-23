@@ -1,5 +1,6 @@
 package com.example.artapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -11,17 +12,21 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.FitCenter
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 
 object ImageLoader {
 
-    fun load(context: Context, imageUrl: String, imageView: ImageView, progressBar: ProgressBar) {
+    @SuppressLint("CheckResult")
+    fun load(context: Context, imageUrl: String, imageView: ImageView, progressBar: ProgressBar, isFavorite: Boolean) {
         val requestOptions = RequestOptions()
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .transform(FitCenter()).downsample(DownsampleStrategy.CENTER_INSIDE).override(800)
+        if (isFavorite) {
+            requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL)
+        } else {
+            requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
+        }
 
         Glide.with(context)
             .load(imageUrl)

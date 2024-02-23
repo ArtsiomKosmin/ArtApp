@@ -1,7 +1,6 @@
 package com.example.data.source.remote
 
-import com.example.data.models.ArtsResponse
-import com.example.data.util.Constants.API_KEY
+import com.example.data.source.remote.models.ArtsResponse
 import com.example.data.util.Constants.INVOLVED_MARKER
 import retrofit2.Response
 import retrofit2.http.GET

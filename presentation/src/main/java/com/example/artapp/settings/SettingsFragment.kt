@@ -1,7 +1,6 @@
 package com.example.artapp.settings
 
 import android.os.Bundle
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat

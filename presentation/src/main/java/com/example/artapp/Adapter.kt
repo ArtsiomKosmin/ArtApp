@@ -2,7 +2,6 @@ package com.example.artapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -72,7 +71,7 @@ class Adapter(
             val animation = AnimationUtils.loadAnimation(binding.root.context, R.anim.recycler_anim)
             binding.root.startAnimation(animation)
 
-            ImageLoader.load(binding.artIm.context, art.webImage.url, binding.artIm, binding.itemProgressBar)
+            ImageLoader.load(binding.artIm.context, art.webImage.url, binding.artIm, binding.itemProgressBar, art.isFavorite)
             binding.titleTv.text = art.title
             binding.favoriteIcon.isSelected = art.isFavorite
         }

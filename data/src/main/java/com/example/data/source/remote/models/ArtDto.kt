@@ -1,4 +1,4 @@
-package com.example.data.models
+package com.example.data.source.remote.models
 
 data class ArtDto(
     val links: Links,

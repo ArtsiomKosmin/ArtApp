@@ -4,8 +4,9 @@ import com.example.data.mapper.toDomain
 import com.example.data.source.remote.ArtApi
 import com.example.domain.models.ArtEntity
 import com.example.domain.repository.ArtRemoteRepository
+import javax.inject.Inject
 
-class ArtRemoteRepositoryImpl(
+class ArtRemoteRepositoryImpl @Inject constructor(
     private val artApi: ArtApi
 ): ArtRemoteRepository {
     override suspend fun getArtObjects(page: Int): List<ArtEntity> {

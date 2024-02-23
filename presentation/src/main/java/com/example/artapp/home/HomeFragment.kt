@@ -2,30 +2,30 @@ package com.example.artapp.home
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.artapp.Adapter
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
+import javax.inject.Inject
 
 
 class HomeFragment : Fragment() {
+    @Inject
+    lateinit var viewModelFactory: HomeViewModel.HomeViewModelFactory
     private lateinit var binding: FragmentHomeBinding
     private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
     private lateinit var pref: SharedPreferences
-    private val viewModel: HomeViewModel by activityViewModels {
-        HomeViewModel.HomeViewModelFactory((context?.applicationContext as MainApp).database)
-    }
+    private val viewModel: HomeViewModel by viewModels { viewModelFactory }
+
     private val paginationListener = PaginationListener {
         viewModel.loadRemoteArts()
     }
@@ -34,6 +34,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        (requireActivity().application as MainApp).appComponent.injectHome(this)
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -112,18 +113,6 @@ class HomeFragment : Fragment() {
             binding.rcView.visibility = View.GONE
 
             binding.swipeRefreshLayout.isRefreshing = false
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        private var instance: HomeFragment? = null
-
-        fun getInstance(): HomeFragment {
-            if (instance == null) {
-                instance = HomeFragment()
-            }
-            return instance!!
         }
     }
 }
