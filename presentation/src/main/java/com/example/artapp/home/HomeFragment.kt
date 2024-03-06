@@ -67,7 +67,6 @@ class HomeFragment : Fragment() {
     private fun observeChanges() {
         viewModel.liveState.observe(viewLifecycleOwner) {
             it.updateUI()
-            paginationListener.setLoading(false)
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -98,6 +97,7 @@ class HomeFragment : Fragment() {
 
             adapter.submitList(arts)
 
+            paginationListener.setLoading(false)
             binding.swipeRefreshLayout.isRefreshing = false
         }
 

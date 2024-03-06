@@ -16,8 +16,8 @@ class LocalArtsUseCase(
         artLocalRepository.insertArt(art)
     }
 
-    suspend fun deleteFromFavorite(art: ArtEntity) {
-        artLocalRepository.deleteCurrentArt(art.id)
+    suspend fun deleteFromFavorite(artId: String) {
+        artLocalRepository.deleteCurrentArt(artId)
     }
 }
 

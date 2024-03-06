@@ -8,6 +8,8 @@ import com.example.domain.useCase.GetRemoteArtsUseCase
 import com.example.domain.models.ArtEntity
 import com.example.domain.useCase.LocalArtsUseCase
 import com.example.domain.useCase.base.executeSafely
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -76,7 +78,7 @@ class HomeViewModel @Inject constructor(
                 if (isFavorite) {
                     localArtsUseCase.addAsFavorite(updatedArt)
                 } else {
-                    localArtsUseCase.deleteFromFavorite(updatedArt)
+                    localArtsUseCase.deleteFromFavorite(updatedArt.id)
                 }
             }
         }

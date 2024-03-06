@@ -20,8 +20,7 @@ class FavouriteViewModel @Inject constructor(
         allFavoriteArts.value?.find { it.id == id }.let {
             viewModelScope.launch {
                 if (it != null) {
-                    localArtsUseCase.deleteFromFavorite(it)
-                    Log.d("Check", "toggle deleted: ${it}")
+                    localArtsUseCase.deleteFromFavorite(it.id)
                 }
             }
         }

@@ -11,11 +11,10 @@ class ArtRemoteRepositoryImpl @Inject constructor(
 ): ArtRemoteRepository {
     override suspend fun getArtObjects(page: Int): List<ArtEntity> {
         val allArts = artApi.getAllArts(page = page)
-        if (allArts.isSuccessful) {
-            return allArts.body()!!.artObjects.map { it.toDomain() }
+        return if (allArts.isSuccessful) {
+            allArts.body()!!.artObjects.map { it.toDomain() }
         } else {
-            throw Exception()
+            emptyList()
         }
-
     }
 }

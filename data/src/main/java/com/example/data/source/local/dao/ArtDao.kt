@@ -14,6 +14,6 @@ interface ArtDao {
     @Query("SELECT * FROM arts")
     fun getAllArts(): Flow<List<ArtEntityDB>>
 
-    @Query("DELETE FROM arts WHERE artId = :artID")
+    @Query("DELETE FROM arts WHERE art_id = :artID")
     suspend fun deleteCurrentArt(artID: String)
 }

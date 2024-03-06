@@ -17,7 +17,7 @@ class DetailsViewModel @Inject constructor(private val localArtsUseCase: LocalAr
     fun favoriteOperations(artEntity: ArtEntity) {
         viewModelScope.launch {
             if (artEntity.isFavorite) {
-                localArtsUseCase.deleteFromFavorite(artEntity)
+                localArtsUseCase.deleteFromFavorite(artEntity.id)
             } else {
                 localArtsUseCase.addAsFavorite(artEntity)
             }

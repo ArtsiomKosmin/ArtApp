@@ -17,7 +17,7 @@ class ArtLocalRepositoryImpl @Inject constructor(
     }
 
     override fun getAllArts(): Flow<List<ArtEntity>> {
-        return dao.getAllArts().map { it.map { it.toDomain() } }
+        return dao.getAllArts().map { art -> art.map { it.toDomain() } }
     }
 
     override suspend fun deleteCurrentArt(artId: String) {
