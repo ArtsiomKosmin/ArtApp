@@ -1,6 +1,5 @@
 package com.example.artapp.home
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,22 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.artapp.Adapter
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentHomeBinding
+import com.example.artapp.viewBinding
+import com.example.domain.useCase.GetSharedPrefsUseCase
 import javax.inject.Inject
 
 
 class HomeFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: HomeViewModel.HomeViewModelFactory
-    private lateinit var binding: FragmentHomeBinding
+    private val binding by viewBinding(FragmentHomeBinding::inflate)
     private val adapter by lazy { Adapter(this::toggleFavoriteStatus) }
-    private lateinit var pref: SharedPreferences
+    @Inject
+    lateinit var getSharedPrefsUseCase: GetSharedPrefsUseCase
+    private val sharedPrefs by lazy { getSharedPrefsUseCase.getSharedPrefs() }
     private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
     private val paginationListener = PaginationListener {
@@ -35,7 +37,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         (requireActivity().application as MainApp).appComponent.injectHome(this)
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -50,14 +51,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun init() {
-        pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
         binding.rcView.layoutManager = getLayoutManager()
         binding.rcView.adapter = adapter
         binding.rcView.addOnScrollListener(paginationListener)
     }
 
     private fun getLayoutManager(): RecyclerView.LayoutManager {
-        return if (pref.getString("arts_style_key", "linear") == "linear") {
+        return if (sharedPrefs.getString("arts_style_key", "linear") == "linear") {
             LinearLayoutManager(requireActivity())
         } else {
             GridLayoutManager(requireContext(), 2)

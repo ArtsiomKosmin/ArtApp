@@ -22,11 +22,15 @@ android {
 
     buildTypes {
         release {
+            buildConfigField("String", "API_KEY", "\"2PtpLcDm\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            buildConfigField("String", "API_KEY", "\"2PtpLcDm\"")
         }
     }
     compileOptions {
@@ -35,6 +39,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

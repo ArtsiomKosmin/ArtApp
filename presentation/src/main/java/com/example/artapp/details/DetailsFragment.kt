@@ -11,13 +11,15 @@ import androidx.navigation.fragment.navArgs
 import com.example.artapp.ImageLoader
 import com.example.artapp.activities.MainApp
 import com.example.artapp.databinding.FragmentDetailsBinding
+import com.example.artapp.databinding.FragmentFavouriteBinding
+import com.example.artapp.viewBinding
 import com.example.domain.models.ArtEntity
 import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: DetailsViewModel.DetailsViewModelFactory
-    private lateinit var binding: FragmentDetailsBinding
+    private val binding by viewBinding(FragmentDetailsBinding::inflate)
     private val navArgs: DetailsFragmentArgs by navArgs()
     private val viewModel: DetailsViewModel by viewModels { viewModelFactory }
 
@@ -27,7 +29,6 @@ class DetailsFragment : Fragment() {
             savedInstanceState: Bundle?
         ): View {
             (requireActivity().application as MainApp).appComponent.injectDetails(this)
-            binding = FragmentDetailsBinding.inflate(inflater, container, false)
             return binding.root
         }
 

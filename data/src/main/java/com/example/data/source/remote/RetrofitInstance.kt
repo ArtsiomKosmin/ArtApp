@@ -1,6 +1,6 @@
 package com.example.data.source.remote
 
-import com.example.data.util.Constants.API_KEY
+import com.example.data.BuildConfig
 import com.example.data.util.Constants.BASE_URL
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -14,7 +14,7 @@ object RetrofitInstance {
         val originalHttpUrl = original.url
 
         val url = originalHttpUrl.newBuilder()
-            .addQueryParameter("key", API_KEY)
+            .addQueryParameter("key", BuildConfig.API_KEY)
             .build()
 
         val requestBuilder = original.newBuilder()

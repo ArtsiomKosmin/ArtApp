@@ -1,28 +1,30 @@
 package com.example.artapp.activities
 
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.example.artapp.R
 import com.example.artapp.databinding.ActivityMainBinding
+import com.example.artapp.viewBinding
+import com.example.domain.useCase.GetSharedPrefsUseCase
 import com.google.android.material.navigation.NavigationBarView
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var defPref: SharedPreferences
+    private val binding by viewBinding(ActivityMainBinding::inflate)
+    @Inject
+    lateinit var sharedPrefsUseCase: GetSharedPrefsUseCase
+    private val sharedPrefs by lazy { sharedPrefsUseCase.getSharedPrefs() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        defPref = PreferenceManager.getDefaultSharedPreferences(this)
+        (application as MainApp).appComponent.injectMainActivity(this)
         val currentTheme = getSelectedTheme()
         setTheme(currentTheme)
 
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navHostFragment =
@@ -33,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getSelectedTheme(): Int {
-        return if (defPref.getString("theme_key", "light") == "light") {
+        return if (sharedPrefs.getString("theme_key", "light") == "light") {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             R.style.Theme_ArtApp_Light
         } else {
@@ -42,18 +44,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-
-//val content: View = findViewById(android.R.id.content)
-//content.viewTreeObserver.addOnPreDrawListener(
-//object : ViewTreeObserver.OnPreDrawListener {
-//    override fun onPreDraw(): Boolean {
-//        return if (viewModel.liveState.value is States.Data) {
-//            content.viewTreeObserver.removeOnPreDrawListener(this)
-//            true
-//        } else {
-//            false
-//        }
-//    }
-//}
-//)
